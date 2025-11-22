@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ALL TALKING</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1><i class="fas fa-user"></i> Profile</h1>
+        </div>
+        
+        <div class="profile-avatar">
+            <i class="fas fa-user fa-3x"></i>
+            <div class="avatar-edit">
+                <i class="fas fa-camera"></i>
+            </div>
+        </div>
+        
+        <!-- Profile View -->
+        <div id="profileView">
+            <div class="profile-info card">
+                <div class="info-item">
+                    <div class="info-label">Name</div>
+                    <div class="info-value" id="profileName"></div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value" id="profileEmail"></div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value" id="profilePhone"></div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="editProfileBtn" style="width: 100%;">Edit Profile</button>
+        </div>
+        
+        <!-- Edit View -->
+        <div id="editView" class="hidden">
+            <div class="profile-info card">
+                <div class="form-group">
+                    <label for="editName" class="form-label">Name</label>
+                    <input type="text" id="editName" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEmail" class="form-label">Email</label>
+                    <input type="email" id="editEmail" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editPhone" class="form-label">Phone</label>
+                    <input type="tel" id="editPhone" class="form-control">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="saveProfileBtn" style="width: 100%; margin-bottom: 1rem;">Save Changes</button>
+            <button class="btn btn-secondary" id="cancelEditBtn" style="width: 100%;">Cancel</button>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="chat.html" class="nav-item">
+            <i class="fas fa-comment"></i>
+            <span>Chats</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+    
+    <script src="../js/script.js"></script>
+</body>
+</html>
