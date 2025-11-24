@@ -1,6 +1,4 @@
-// ALL TALKING Chat System - Complete JavaScript
-// Global variables
-let currentUser = null;
+//Lets get the party started
 let chats = [];
 let messages = {};
 let typingUsers = {};
@@ -8,17 +6,36 @@ let emojiPickerActive = false;
 let statusUpdates = [];
 let currentChatId = null;
 
-// DOM Content Loaded
+//Demo to test it out
+const DEMO_ACCOUNT = {
+    email: 'demo@alltalking.com',
+    password: 'demo123',
+    name: 'Demo User'
+};
+
+// DOM Content Loaded code
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing app');
     initializeApp();
     
     // Check if user is logged in
     if (localStorage.getItem('currentUser')) {
         currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        console.log('Current user:', currentUser);
+    } else {
+        console.log('No user logged in');
+        // Redirect to login if not on landing, login, or register pages
+        const path = window.location.pathname;
+        if (!path.includes('index.html') && !path.includes('login.html') && !path.includes('register.html') && !path.endsWith('/')) {
+            window.location.href = '../index.html';
+            return;
+        }
     }
     
-    // Initialize page-specific functionality
+    // Initialize page-specific 
     const path = window.location.pathname;
+    console.log('Current path:', path);
+    
     if (path.includes('index.html') || path.endsWith('/')) {
         initLandingPage();
     } else if (path.includes('login.html')) {
@@ -48,20 +65,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize app
 function initializeApp() {
-    // Load users and chats from localStorage
+    console.log('Initializing app...');
+    
+    // Initialize localStorage if empty
     if (!localStorage.getItem('users')) {
+        console.log('Initializing users storage');
         localStorage.setItem('users', JSON.stringify([]));
     }
     
     if (!localStorage.getItem('chats')) {
+        console.log('Initializing chats storage');
         localStorage.setItem('chats', JSON.stringify([]));
     }
     
     if (!localStorage.getItem('messages')) {
+        console.log('Initializing messages storage');
         localStorage.setItem('messages', JSON.stringify({}));
     }
     
     if (!localStorage.getItem('statusUpdates')) {
+        console.log('Initializing status updates storage');
         localStorage.setItem('statusUpdates', JSON.stringify([]));
     }
     
@@ -75,69 +98,69 @@ function initializeApp() {
 
 // Initialize sample data
 function initSampleData() {
+    console.log('Checking for sample data...');
     const users = JSON.parse(localStorage.getItem('users'));
-    if (users.length === 0) {
+    const chatsData = JSON.parse(localStorage.getItem('chats'));
+    const messagesData = JSON.parse(localStorage.getItem('messages'));
+    const statusData = JSON.parse(localStorage.getItem('statusUpdates'));
+    
+    // Only create sample data if all are empty
+    if (users.length === 0 && chatsData.length === 0 && Object.keys(messagesData).length === 0 && statusData.length === 0) {
+        console.log('Creating sample data...');
+        
+        // Sample users including demo user
         const sampleUsers = [
             {
                 id: 1,
-                name: 'Alex Johnson',
-                email: 'alex@example.com',
+                name: 'Demo User',
+                email: 'demo@alltalking.com',
                 phone: '+1234567890',
-                password: 'password123',
+                password: 'demo123',
                 avatar: null
             },
             {
                 id: 2,
-                name: 'Sarah Miller',
-                email: 'sarah@example.com',
+                name: 'Alex Johnson',
+                email: 'alex@example.com',
                 phone: '+1234567891',
                 password: 'password123',
                 avatar: null
             },
             {
                 id: 3,
-                name: 'Mike Wilson',
-                email: 'mike@example.com',
+                name: 'Sarah Miller',
+                email: 'sarah@example.com',
                 phone: '+1234567892',
                 password: 'password123',
                 avatar: null
             },
             {
                 id: 4,
-                name: 'Emma Davis',
-                email: 'emma@example.com',
+                name: 'Mike Wilson',
+                email: 'mike@example.com',
                 phone: '+1234567893',
                 password: 'password123',
                 avatar: null
             },
             {
                 id: 5,
-                name: 'David Brown',
-                email: 'david@example.com',
+                name: 'Emma Davis',
+                email: 'emma@example.com',
                 phone: '+1234567894',
-                password: 'password123',
-                avatar: null
-            },
-            {
-                id: 6,
-                name: 'Lisa Taylor',
-                email: 'lisa@example.com',
-                phone: '+1234567895',
                 password: 'password123',
                 avatar: null
             }
         ];
         localStorage.setItem('users', JSON.stringify(sampleUsers));
-    }
-    
-    const chatsData = JSON.parse(localStorage.getItem('chats'));
-    if (chatsData.length === 0) {
+        console.log('Sample users created');
+        
+        // Sample chats - Demo User (id:1) is participant in all chats
         const sampleChats = [
             {
                 id: 1,
                 name: 'Alex Johnson',
                 type: 'private',
-                participants: [1, 7], // Assuming current user has id 7
+                participants: [1, 2],
                 lastMessage: 'Hey, are we still meeting tomorrow?',
                 lastMessageTime: new Date().toISOString(),
                 unread: 2
@@ -146,7 +169,7 @@ function initSampleData() {
                 id: 2,
                 name: 'Sarah Miller',
                 type: 'private',
-                participants: [2, 7],
+                participants: [1, 3],
                 lastMessage: 'Thanks for your help yesterday!',
                 lastMessageTime: new Date(Date.now() - 3600000).toISOString(),
                 unread: 0
@@ -155,7 +178,7 @@ function initSampleData() {
                 id: 3,
                 name: 'Work Group',
                 type: 'group',
-                participants: [1, 2, 3, 7],
+                participants: [1, 2, 3, 4],
                 lastMessage: 'Mike: The meeting is postponed to 3 PM',
                 lastMessageTime: new Date(Date.now() - 7200000).toISOString(),
                 unread: 5
@@ -164,7 +187,7 @@ function initSampleData() {
                 id: 4,
                 name: 'Mike Wilson',
                 type: 'private',
-                participants: [3, 7],
+                participants: [1, 4],
                 lastMessage: 'Can you send me those files?',
                 lastMessageTime: new Date(Date.now() - 86400000).toISOString(),
                 unread: 0
@@ -173,45 +196,35 @@ function initSampleData() {
                 id: 5,
                 name: 'Emma Davis',
                 type: 'private',
-                participants: [4, 7],
+                participants: [1, 5],
                 lastMessage: 'The party starts at 8 PM, don\'t be late!',
                 lastMessageTime: new Date(Date.now() - 172800000).toISOString(),
                 unread: 1
-            },
-            {
-                id: 6,
-                name: 'David Brown',
-                type: 'private',
-                participants: [5, 7],
-                lastMessage: 'Did you watch the game last night?',
-                lastMessageTime: new Date(Date.now() - 259200000).toISOString(),
-                unread: 0
             }
         ];
         localStorage.setItem('chats', JSON.stringify(sampleChats));
-    }
-    
-    const messagesData = JSON.parse(localStorage.getItem('messages'));
-    if (Object.keys(messagesData).length === 0) {
+        console.log('Sample chats created');
+        
+        // Sample messages - Demo User (id:1) is sender in some messages
         const sampleMessages = {
             1: [
                 {
                     id: 1,
-                    senderId: 1,
+                    senderId: 2,
                     content: 'Hey, are we still meeting tomorrow?',
                     timestamp: new Date(Date.now() - 600000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 2,
-                    senderId: 7,
+                    senderId: 1,
                     content: 'Yes, definitely! 7 PM at the usual place.',
                     timestamp: new Date(Date.now() - 300000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 3,
-                    senderId: 1,
+                    senderId: 2,
                     content: 'Perfect! See you then 👋',
                     timestamp: new Date(Date.now() - 120000).toISOString(),
                     type: 'text'
@@ -220,21 +233,21 @@ function initSampleData() {
             2: [
                 {
                     id: 1,
-                    senderId: 2,
+                    senderId: 3,
                     content: 'Thanks for your help yesterday!',
                     timestamp: new Date(Date.now() - 3600000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 2,
-                    senderId: 7,
+                    senderId: 1,
                     content: 'No problem! Happy to help.',
                     timestamp: new Date(Date.now() - 3500000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 3,
-                    senderId: 2,
+                    senderId: 3,
                     content: 'Let me know if you need anything from me too!',
                     timestamp: new Date(Date.now() - 3400000).toISOString(),
                     type: 'text'
@@ -250,28 +263,28 @@ function initSampleData() {
                 },
                 {
                     id: 2,
-                    senderId: 3,
+                    senderId: 4,
                     content: 'I\'ve prepared the initial specs',
                     timestamp: new Date(Date.now() - 86000000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 3,
-                    senderId: 2,
+                    senderId: 3,
                     content: 'When should we schedule the meeting?',
                     timestamp: new Date(Date.now() - 85000000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 4,
-                    senderId: 7,
+                    senderId: 1,
                     content: 'How about tomorrow at 10 AM?',
                     timestamp: new Date(Date.now() - 84000000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 5,
-                    senderId: 3,
+                    senderId: 4,
                     content: 'The meeting is postponed to 3 PM',
                     timestamp: new Date(Date.now() - 7200000).toISOString(),
                     type: 'text'
@@ -280,14 +293,14 @@ function initSampleData() {
             4: [
                 {
                     id: 1,
-                    senderId: 3,
+                    senderId: 4,
                     content: 'Can you send me those files?',
                     timestamp: new Date(Date.now() - 86400000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 2,
-                    senderId: 7,
+                    senderId: 1,
                     content: 'Sure, I\'ll send them over in a bit',
                     timestamp: new Date(Date.now() - 86000000).toISOString(),
                     type: 'text'
@@ -296,86 +309,62 @@ function initSampleData() {
             5: [
                 {
                     id: 1,
-                    senderId: 4,
+                    senderId: 5,
                     content: 'Hey! Are you coming to the party on Saturday?',
                     timestamp: new Date(Date.now() - 172800000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 2,
-                    senderId: 7,
+                    senderId: 1,
                     content: 'Yes, I\'ll be there!',
                     timestamp: new Date(Date.now() - 172000000).toISOString(),
                     type: 'text'
                 },
                 {
                     id: 3,
-                    senderId: 4,
+                    senderId: 5,
                     content: 'Great! The party starts at 8 PM, don\'t be late!',
                     timestamp: new Date(Date.now() - 171500000).toISOString(),
-                    type: 'text'
-                }
-            ],
-            6: [
-                {
-                    id: 1,
-                    senderId: 5,
-                    content: 'Did you watch the game last night?',
-                    timestamp: new Date(Date.now() - 259200000).toISOString(),
-                    type: 'text'
-                },
-                {
-                    id: 2,
-                    senderId: 7,
-                    content: 'Yes, it was amazing! That last goal was incredible!',
-                    timestamp: new Date(Date.now() - 258000000).toISOString(),
-                    type: 'text'
-                },
-                {
-                    id: 3,
-                    senderId: 5,
-                    content: 'I know right! Best game of the season so far',
-                    timestamp: new Date(Date.now() - 257000000).toISOString(),
                     type: 'text'
                 }
             ]
         };
         localStorage.setItem('messages', JSON.stringify(sampleMessages));
-    }
-    
-    const statusData = JSON.parse(localStorage.getItem('statusUpdates'));
-    if (statusData.length === 0) {
+        console.log('Sample messages created');
+        
+        // Sample status updates
         const sampleStatuses = [
             {
                 id: 1,
-                userId: 1,
+                userId: 2,
                 userName: 'Alex Johnson',
-                text: 'At the beach!',
+                text: 'At the beach! 🏖',
                 media: null,
                 timestamp: new Date().toISOString(),
                 expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
             },
             {
                 id: 2,
-                userId: 2,
+                userId: 3,
                 userName: 'Sarah Miller',
-                text: 'Working on new project',
+                text: 'Working on new project 💻',
                 media: null,
                 timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
                 expiresAt: new Date(Date.now() + 22 * 60 * 60 * 1000).toISOString()
             },
             {
                 id: 3,
-                userId: 3,
+                userId: 4,
                 userName: 'Mike Wilson',
-                text: 'Game night!',
+                text: 'Game night! 🎮',
                 media: null,
                 timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
                 expiresAt: new Date(Date.now() + 19 * 60 * 60 * 1000).toISOString()
             },
             {
                 id: 4,
-                userId: 4,
+                userId: 5,
                 userName: 'Emma Davis',
                 text: 'Coffee time ☕',
                 media: null,
@@ -384,18 +373,75 @@ function initSampleData() {
             }
         ];
         localStorage.setItem('statusUpdates', JSON.stringify(sampleStatuses));
+        console.log('Sample status updates created');
+    } else {
+        console.log('Sample data already exists or partial data found');
     }
 }
 
 // Landing Page
 function initLandingPage() {
-    // No specific functionality needed for landing page
+    console.log('Initializing landing page');
+    
+    // Add demo login button to landing page
+    const authButtons = document.querySelector('.auth-buttons');
+    if (authButtons) {
+        const demoButton = document.createElement('button');
+        demoButton.className = 'btn btn-secondary';
+        demoButton.textContent = 'Try Demo';
+        demoButton.addEventListener('click', function() {
+            // Auto-fill demo credentials and redirect to login
+            localStorage.setItem('demoCredentials', JSON.stringify(DEMO_ACCOUNT));
+            window.location.href = 'features/login.html';
+        });
+        authButtons.appendChild(demoButton);
+    }
 }
 
 // Login Page
 function initLoginPage() {
+    console.log('Initializing login page');
+    
+    // Auto-fill demo credentials if available
+    const demoCredentials = localStorage.getItem('demoCredentials');
+    if (demoCredentials) {
+        const demo = JSON.parse(demoCredentials);
+        document.getElementById('email').value = demo.email;
+        document.getElementById('password').value = demo.password;
+        localStorage.removeItem('demoCredentials'); // Clean up
+    }
+    
+    // Add demo login button
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
+        const demoButton = document.createElement('button');
+        demoButton.type = 'button';
+        demoButton.className = 'btn btn-secondary';
+        demoButton.textContent = 'Login with Demo Account';
+        demoButton.style.marginTop = '1rem';
+        demoButton.style.width = '100%';
+        
+        demoButton.addEventListener('click', function() {
+            document.getElementById('email').value = DEMO_ACCOUNT.email;
+            document.getElementById('password').value = DEMO_ACCOUNT.password;
+            
+            // Automatically submit the form
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = users.find(u => u.email === DEMO_ACCOUNT.email && u.password === DEMO_ACCOUNT.password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                console.log('Demo user logged in:', user.name);
+                window.location.href = 'chat.html';
+            } else {
+                alert('Demo account not found. Please register first or check if sample data was created.');
+            }
+        });
+        
+        loginForm.appendChild(demoButton);
+        
+        // Regular login form submission
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -408,6 +454,7 @@ function initLoginPage() {
             if (user) {
                 currentUser = user;
                 localStorage.setItem('currentUser', JSON.stringify(user));
+                console.log('User logged in:', user.name);
                 window.location.href = 'chat.html';
             } else {
                 alert('Invalid email/username or password');
@@ -418,6 +465,7 @@ function initLoginPage() {
 
 // Register Page
 function initRegisterPage() {
+    console.log('Initializing register page');
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
@@ -463,6 +511,7 @@ function initRegisterPage() {
 
 // Chat Page
 function initChatPage() {
+    console.log('Initializing chat page for user:', currentUser.name);
     loadStatusUpdates();
     loadChats();
     setupChatEventListeners();
@@ -478,9 +527,13 @@ function initChatPage() {
 
 // Load status updates
 function loadStatusUpdates() {
+    console.log('Loading status updates');
     statusUpdates = JSON.parse(localStorage.getItem('statusUpdates')) || [];
     const statusList = document.getElementById('statusList');
-    if (!statusList) return;
+    if (!statusList) {
+        console.log('Status list element not found');
+        return;
+    }
     
     statusList.innerHTML = '';
     
@@ -502,51 +555,58 @@ function loadStatusUpdates() {
     
     // Add other statuses
     statusUpdates.forEach(status => {
-        if (status.userId !== currentUser.id) {
-            const statusItem = document.createElement('div');
-            statusItem.className = 'status-item';
-            statusItem.innerHTML = `
-                <div class="status-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="status-name">${status.userName}</div>
-            `;
-            
-            statusList.appendChild(statusItem);
-        }
+        const statusItem = document.createElement('div');
+        statusItem.className = 'status-item';
+        statusItem.innerHTML = `
+            <div class="status-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="status-name">${status.userName}</div>
+        `;
+        
+        statusList.appendChild(statusItem);
     });
+    
+    console.log('Status updates loaded:', statusUpdates.length);
 }
 
 // Show add status modal
 function showAddStatusModal() {
+    console.log('Showing add status modal');
     const modal = document.getElementById('addStatusModal');
-    if (!modal) return;
+    if (!modal) {
+        console.log('Add status modal not found');
+        return;
+    }
     
     modal.classList.add('active');
     
     // Setup event listeners for the modal
-    document.getElementById('closeStatusModal').addEventListener('click', () => {
-        modal.classList.remove('active');
-    });
-    
-    document.getElementById('cancelStatusBtn').addEventListener('click', () => {
-        modal.classList.remove('active');
-    });
-    
-    // Upload area click handler
+    const closeStatusModal = document.getElementById('closeStatusModal');
+    const cancelStatusBtn = document.getElementById('cancelStatusBtn');
+    const postStatusBtn = document.getElementById('postStatusBtn');
     const uploadArea = document.getElementById('uploadArea');
-    if (uploadArea) {
-        uploadArea.addEventListener('click', () => {
-            document.getElementById('statusMedia').click();
-        });
+    
+    if (closeStatusModal) {
+        closeStatusModal.onclick = () => modal.classList.remove('active');
     }
     
-    // Post status button
-    document.getElementById('postStatusBtn').addEventListener('click', postStatus);
+    if (cancelStatusBtn) {
+        cancelStatusBtn.onclick = () => modal.classList.remove('active');
+    }
+    
+    if (uploadArea) {
+        uploadArea.onclick = () => document.getElementById('statusMedia').click();
+    }
+    
+    if (postStatusBtn) {
+        postStatusBtn.onclick = postStatus;
+    }
 }
 
 // Post a new status
 function postStatus() {
+    console.log('Posting new status');
     const statusText = document.getElementById('statusText').value;
     const statusMedia = document.getElementById('statusMedia').files[0];
     
@@ -577,19 +637,38 @@ function postStatus() {
     // Reset form
     document.getElementById('statusText').value = '';
     document.getElementById('statusMedia').value = '';
+    
+    console.log('Status posted successfully');
 }
 
 // Load chats from localStorage
 function loadChats() {
+    console.log('Loading chats');
     chats = JSON.parse(localStorage.getItem('chats')) || [];
     messages = JSON.parse(localStorage.getItem('messages')) || {};
     
     const chatsList = document.getElementById('chatsList');
-    if (!chatsList) return;
+    if (!chatsList) {
+        console.log('Chats list element not found');
+        return;
+    }
     
     chatsList.innerHTML = '';
     
-    chats.forEach(chat => {
+    if (chats.length === 0) {
+        chatsList.innerHTML = '<div class="no-chats">No conversations yet. Start a new chat!</div>';
+        return;
+    }
+    
+    // Filter chats to show only those where current user is a participant
+    const userChats = chats.filter(chat => chat.participants.includes(currentUser.id));
+    
+    if (userChats.length === 0) {
+        chatsList.innerHTML = '<div class="no-chats">No conversations yet. Start a new chat!</div>';
+        return;
+    }
+    
+    userChats.forEach(chat => {
         const chatElement = document.createElement('div');
         chatElement.className = 'chat-item';
         chatElement.dataset.chatId = chat.id;
@@ -623,12 +702,18 @@ function loadChats() {
         
         chatsList.appendChild(chatElement);
     });
+    
+    console.log('Chats loaded:', userChats.length);
 }
 
 // Open a chat
 function openChat(chatId) {
+    console.log('Opening chat:', chatId);
     const chat = chats.find(c => c.id === chatId);
-    if (!chat) return;
+    if (!chat) {
+        console.log('Chat not found:', chatId);
+        return;
+    }
     
     currentChatId = chatId;
     
@@ -698,12 +783,18 @@ function openChat(chatId) {
     
     // Mark messages as read
     markChatAsRead(chatId);
+    
+    console.log('Chat opened:', chatName);
 }
 
 // Load messages for a chat
 function loadChatMessages(chatId) {
+    console.log('Loading messages for chat:', chatId);
     const messagesContainer = document.getElementById('messagesContainer');
-    if (!messagesContainer) return;
+    if (!messagesContainer) {
+        console.log('Messages container not found');
+        return;
+    }
     
     messagesContainer.innerHTML = '';
     
@@ -711,24 +802,28 @@ function loadChatMessages(chatId) {
     const users = JSON.parse(localStorage.getItem('users'));
     const chat = chats.find(c => c.id === chatId);
     
-    chatMessages.forEach(msg => {
-        const messageElement = document.createElement('div');
-        messageElement.className = message ${msg.senderId === currentUser.id ? 'sent' : 'received'};
-        
-        const sender = users.find(u => u.id === msg.senderId);
-        const senderName = sender ? sender.name : 'Unknown';
-        
-        messageElement.innerHTML = `
-            ${msg.senderId !== currentUser.id && chat.type === 'group' ? 
-                <div class="message-sender">${senderName}</div> : ''}
-            <div class="message-content">
-                <p>${msg.content}</p>
-                <div class="message-time">${formatTime(msg.timestamp)}</div>
-            </div>
-        `;
-        
-        messagesContainer.appendChild(messageElement);
-    });
+    if (chatMessages.length === 0) {
+        messagesContainer.innerHTML = '<div class="no-messages">No messages yet. Start the conversation!</div>';
+    } else {
+        chatMessages.forEach(msg => {
+            const messageElement = document.createElement('div');
+            messageElement.className = message ${msg.senderId === currentUser.id ? 'sent' : 'received'};
+            
+            const sender = users.find(u => u.id === msg.senderId);
+            const senderName = sender ? sender.name : 'Unknown';
+            
+            messageElement.innerHTML = `
+                ${msg.senderId !== currentUser.id && chat.type === 'group' ? 
+                    <div class="message-sender">${senderName}</div> : ''}
+                <div class="message-content">
+                    <p>${msg.content}</p>
+                    <div class="message-time">${formatTime(msg.timestamp)}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+        });
+    }
     
     // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -750,9 +845,17 @@ function loadChatMessages(chatId) {
         messageInput.placeholder = Message ${chatName};
         messageInput.dataset.chatId = chatId;
         
+        // Clear any existing event listeners
+        sendButton.replaceWith(sendButton.cloneNode(true));
+        messageInput.replaceWith(messageInput.cloneNode(true));
+        
+        // Get new references
+        const newSendButton = document.getElementById('sendButton');
+        const newMessageInput = document.getElementById('messageInput');
+        
         // Add event listeners for sending messages
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
+        newSendButton.addEventListener('click', sendMessage);
+        newMessageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
@@ -760,14 +863,16 @@ function loadChatMessages(chatId) {
         });
         
         // Typing indicator
-        messageInput.addEventListener('input', () => {
-            if (messageInput.value.trim()) {
+        newMessageInput.addEventListener('input', () => {
+            if (newMessageInput.value.trim()) {
                 showTypingIndicator(chatId);
             } else {
                 hideTypingIndicator(chatId);
             }
         });
     }
+    
+    console.log('Messages loaded:', chatMessages.length);
 }
 
 // Send a message
@@ -775,10 +880,16 @@ function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const chatId = parseInt(messageInput.dataset.chatId);
     
-    if (!messageInput.value.trim() || !chatId) return;
+    if (!messageInput.value.trim() || !chatId) {
+        console.log('No message or chat ID');
+        return;
+    }
     
     const chat = chats.find(c => c.id === chatId);
-    if (!chat) return;
+    if (!chat) {
+        console.log('Chat not found:', chatId);
+        return;
+    }
     
     // Create new message
     const newMessage = {
@@ -811,6 +922,8 @@ function sendMessage() {
     
     // Reload messages
     loadChatMessages(chatId);
+    
+    console.log('Message sent in chat:', chatId);
 }
 
 // Show typing indicator
@@ -874,6 +987,8 @@ function formatTime(timestamp) {
 
 // Setup event listeners for chat page
 function setupChatEventListeners() {
+    console.log('Setting up chat event listeners');
+    
     // Add chat button
     const addChatBtn = document.getElementById('addChatBtn');
     if (addChatBtn) {
@@ -920,26 +1035,22 @@ function setupChatEventListeners() {
     }
     
     // Search functionality
-    const searchButton = document.querySelector('.status-actions .btn-icon:first-child');
+    const searchButton = document.querySelector('.status-actions .btn-icon');
     if (searchButton) {
         searchButton.addEventListener('click', () => {
             alert('Search functionality would open here');
-        });
-    }
-    
-    // Menu functionality
-    const menuButton = document.querySelector('.status-actions .btn-icon:last-child');
-    if (menuButton) {
-        menuButton.addEventListener('click', () => {
-            alert('Chat list menu would open here');
         });
     }
 }
 
 // Show add chat modal
 function showAddChatModal() {
+    console.log('Showing add chat modal');
     const modal = document.getElementById('addChatModal');
-    if (!modal) return;
+    if (!modal) {
+        console.log('Add chat modal not found');
+        return;
+    }
     
     const users = JSON.parse(localStorage.getItem('users'));
     const otherUsers = users.filter(u => u.id !== currentUser.id);
@@ -965,12 +1076,15 @@ function showAddChatModal() {
     
     modal.classList.add('active');
     
-    // Create chat button
+    // Clear any existing event listeners and re-add
+    const createChatBtn = document.getElementById('createChat');
+    createChatBtn.replaceWith(createChatBtn.cloneNode(true));
     document.getElementById('createChat').addEventListener('click', createNewChat);
 }
 
 // Create new chat
 function createNewChat() {
+    console.log('Creating new chat');
     const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked'))
         .map(cb => parseInt(cb.value));
     
@@ -1030,10 +1144,13 @@ function createNewChat() {
     
     // Open the new chat
     openChat(newChat.id);
+    
+    console.log('New chat created:', newChat.name);
 }
 
 // Load emoji picker
 function loadEmojiPicker() {
+    console.log('Loading emoji picker');
     const emojiPicker = document.getElementById('emojiPicker');
     if (!emojiPicker) return;
     
@@ -1042,11 +1159,7 @@ function loadEmojiPicker() {
         'Smileys & People': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳'],
         'Animals & Nature': ['🐵', '🐒', '🦍', '🦧', '🐶', '🐕', '🦮', '🐩', '🐺', '🦊', '🦝', '🐱', '🐈', '🦁', '🐯', '🐅', '🐆', '🐴', '🐎', '🦄', '🦓', '🦌', '🐮', '🐂', '🐃', '🐄', '🐷', '🐖', '🐗', '🐽', '🐏', '🐑'],
         'Food & Drink': ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠'],
-        'Travel & Places': ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜', '🏍', '🛵', '🚲', '🛴', '🛹', '🛼', '🚁', '✈', '🛩', '🛫', '🛬', '🪂', '💺', '🚀', '🛸', '🚉', '🚊'],
-        'Activities': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷', '⛸'],
-        'Objects': ['⌚', '📱', '📲', '💻', '⌨', '🖥', '🖨', '🖱', '🖲', '🕹', '🗜', '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽', '🎞', '📞', '☎', '📟', '📠', '📺', '📻', '🎙', '🎚', '🎛'],
-        'Symbols': ['❤', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮', '✝', '☪', '🕉', '☸', '✡', '🔯', '🕎', '☯', '☦', '🛐', '⛎'],
-        'Flags': ['🏳', '🏴', '🏁', '🚩', '🏳‍🌈', '🏳‍⚧', '🏴‍☠', '🇦🇫', '🇦🇽', '🇦🇱', '🇩🇿', '🇦🇸', '🇦🇩', '🇦🇴', '🇦🇮', '🇦🇶', '🇦🇬', '🇦🇷', '🇦🇲', '🇦🇼', '🇦🇺', '🇦🇹', '🇦🇿', '🇧🇸', '🇧🇭', '🇧🇩', '🇧🇧', '🇧🇾', '🇧🇪', '🇧🇿', '🇧🇯']
+        'Travel & Places': ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜', '🏍', '🛵', '🚲', '🛴', '🛹', '🛼', '🚁', '✈', '🛩', '🛫', '🛬', '🪂', '💺', '🚀', '🛸', '🚉', '🚊']
     };
     
     emojiPicker.innerHTML = '';
@@ -1086,17 +1199,31 @@ function loadEmojiPicker() {
 
 // Start message refresh interval
 function startMessageRefresh() {
+    console.log('Starting message refresh interval');
     setInterval(() => {
         if (document.getElementById('chatView') && 
             !document.getElementById('chatView').classList.contains('hidden') &&
             currentChatId) {
-            loadChatMessages(currentChatId);
+            // Only refresh messages if we're in a chat
+            const messagesContainer = document.getElementById('messagesContainer');
+            if (messagesContainer) {
+                const scrollPos = messagesContainer.scrollTop;
+                const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= scrollPos + 1;
+                
+                loadChatMessages(currentChatId);
+                
+                // If user was scrolled to bottom, keep them there
+                if (isScrolledToBottom) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            }
         }
     }, 200); // Refresh every 0.2 seconds
 }
 
 // Profile Page
 function initProfilePage() {
+    console.log('Initializing profile page');
     loadProfileData();
     
     const editProfileBtn = document.getElementById('editProfileBtn');
@@ -1194,6 +1321,7 @@ function changeAvatar() {
 
 // Settings Page
 function initSettingsPage() {
+    console.log('Initializing settings page');
     loadSettings();
     
     // Theme toggle
@@ -1266,3 +1394,74 @@ function updateSettings(e) {
     
     alert('Settings updated successfully!');
 }
+
+// Add some CSS for empty states
+const style = document.createElement('style');
+style.textContent = `
+    .no-chats, .no-messages {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+    
+    .user-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+    
+    .user-details {
+        flex: 1;
+    }
+    
+    .user-name {
+        font-weight: 500;
+        margin-bottom: 0.2rem;
+    }
+    
+    .user-email {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+    
+    .user-checkbox {
+        margin-left: 1rem;
+    }
+    
+    .upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.3s;
+    }
+    
+    .upload-area:hover {
+        border-color: var(--primary-color);
+    }
+    
+    .upload-area i {
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-area p {
+        margin: 0;
+        color: var(--text-muted);
+    }
+`;
+document.head.appendChild(style);
