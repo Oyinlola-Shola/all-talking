@@ -5,6 +5,7 @@ let typingUsers = {};
 let emojiPickerActive = false;
 let statusUpdates = [];
 let currentChatId = null;
+let currentUser = null;
 
 //Demo to test it out
 const DEMO_ACCOUNT = {
@@ -516,6 +517,8 @@ function initChatPage() {
     loadChats();
     setupChatEventListeners();
     startMessageRefresh();
+    // Start message simulator for testing incoming messages
+    simulateIncomingMessages();
     
     // If a chat is selected from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
@@ -599,7 +602,7 @@ function showAddStatusModal() {
         uploadArea.onclick = () => document.getElementById('statusMedia').click();
     }
     
-    if (postStatusBtn) {
+        if (postStatusBtn) {
         postStatusBtn.onclick = postStatus;
     }
 }
@@ -692,7 +695,7 @@ function loadChats() {
             </div>
             <div class="chat-meta">
                 <div class="chat-time">${formatTime(chat.lastMessageTime)}</div>
-                ${chat.unread > 0 ? <div class="chat-unread">${chat.unread}</div> : ''}
+                ${chat.unread > 0 ? `<div class="chat-unread">${chat.unread}</div>` : ''}
             </div>
         `;
         
@@ -718,7 +721,7 @@ function openChat(chatId) {
     currentChatId = chatId;
     
     // Update URL without reloading
-    window.history.pushState({}, '', chat.html?chat=${chatId});
+    window.history.pushState({}, '', `chat.html?chat=${chatId}`);
     
     // Show chat interface
     document.getElementById('chatsView').classList.add('hidden');
@@ -737,7 +740,7 @@ function openChat(chatId) {
     });
     
     const chatName = chat.type === 'group' ? chat.name : participantNames[0] || 'Unknown';
-    const status = chat.type === 'group' ? ${chat.participants.length} participants : 'Online';
+    const status = chat.type === 'group' ? `${chat.participants.length} participants` : 'Online';
     
     chatHeader.innerHTML = `
         <button class="back-button" id="backToChats">
@@ -770,15 +773,15 @@ function openChat(chatId) {
     
     // Add call button event listeners
     document.getElementById('voiceCallBtn').addEventListener('click', () => {
-        alert(Voice call to ${chatName} would start here);
+        alert(`Voice call to ${chatName} would start here`);
     });
-    
+
     document.getElementById('videoCallBtn').addEventListener('click', () => {
-        alert(Video call to ${chatName} would start here);
+        alert(`Video call to ${chatName} would start here`);
     });
-    
+
     document.getElementById('chatMenuBtn').addEventListener('click', () => {
-        alert(Chat menu for ${chatName} would open here);
+        alert(`Chat menu for ${chatName} would open here`);
     });
     
     // Mark messages as read
@@ -807,14 +810,14 @@ function loadChatMessages(chatId) {
     } else {
         chatMessages.forEach(msg => {
             const messageElement = document.createElement('div');
-            messageElement.className = message ${msg.senderId === currentUser.id ? 'sent' : 'received'};
+            messageElement.className = `message ${msg.senderId === currentUser.id ? 'sent' : 'received'}`;
             
             const sender = users.find(u => u.id === msg.senderId);
             const senderName = sender ? sender.name : 'Unknown';
             
             messageElement.innerHTML = `
                 ${msg.senderId !== currentUser.id && chat.type === 'group' ? 
-                    <div class="message-sender">${senderName}</div> : ''}
+                    `<div class="message-sender">${senderName}</div>` : ''}
                 <div class="message-content">
                     <p>${msg.content}</p>
                     <div class="message-time">${formatTime(msg.timestamp)}</div>
@@ -833,16 +836,16 @@ function loadChatMessages(chatId) {
     const sendButton = document.getElementById('sendButton');
     
     if (messageInput && sendButton) {
-        const users = JSON.parse(localStorage.getItem('users'));
+        const usersList = JSON.parse(localStorage.getItem('users'));
         const otherParticipants = chat.participants.filter(id => id !== currentUser.id);
         const participantNames = otherParticipants.map(id => {
-            const user = users.find(u => u.id === id);
+            const user = usersList.find(u => u.id === id);
             return user ? user.name : 'Unknown User';
         });
-        
+
         const chatName = chat.type === 'group' ? chat.name : participantNames[0] || 'Unknown';
-        
-        messageInput.placeholder = Message ${chatName};
+
+        messageInput.placeholder = `Message ${chatName}`;
         messageInput.dataset.chatId = chatId;
         
         // Clear any existing event listeners
@@ -852,6 +855,11 @@ function loadChatMessages(chatId) {
         // Get new references
         const newSendButton = document.getElementById('sendButton');
         const newMessageInput = document.getElementById('messageInput');
+
+        // Preserve chatId on the cloned input (dataset isn't copied by cloneNode)
+        if (newMessageInput && newMessageInput.dataset) {
+            newMessageInput.dataset.chatId = chatId;
+        }
         
         // Add event listeners for sending messages
         newSendButton.addEventListener('click', sendMessage);
@@ -878,13 +886,20 @@ function loadChatMessages(chatId) {
 // Send a message
 function sendMessage() {
     const messageInput = document.getElementById('messageInput');
-    const chatId = parseInt(messageInput.dataset.chatId);
-    
+    if (!messageInput) {
+        console.log('Message input not found');
+        return;
+    }
+
+    // Prefer dataset chatId, otherwise fallback to currentChatId
+    const datasetChatId = messageInput.dataset ? parseInt(messageInput.dataset.chatId) : NaN;
+    const chatId = !isNaN(datasetChatId) ? datasetChatId : currentChatId;
+
     if (!messageInput.value.trim() || !chatId) {
         console.log('No message or chat ID');
         return;
     }
-    
+
     const chat = chats.find(c => c.id === chatId);
     if (!chat) {
         console.log('Chat not found:', chatId);
@@ -914,15 +929,17 @@ function sendMessage() {
     localStorage.setItem('messages', JSON.stringify(messages));
     localStorage.setItem('chats', JSON.stringify(chats));
     
-    // Clear input
+    // Clear input and focus
     messageInput.value = '';
-    
+    messageInput.focus();
+
     // Hide typing indicator
     hideTypingIndicator(chatId);
-    
-    // Reload messages
+
+    // Reload messages and chats list
     loadChatMessages(chatId);
-    
+    loadChats();
+
     console.log('Message sent in chat:', chatId);
 }
 
@@ -941,8 +958,8 @@ function showTypingIndicator(chatId) {
         });
         
         const userName = chat.type === 'group' ? 'Someone' : participantNames[0] || 'Unknown';
-        
-        document.getElementById('typingText').textContent = ${userName} is typing;
+
+        document.getElementById('typingText').textContent = `${userName} is typing`;
         typingIndicator.classList.remove('hidden');
         chatStatus.textContent = 'Typing...';
     }
@@ -956,7 +973,7 @@ function hideTypingIndicator(chatId) {
     
     if (typingIndicator && chatStatus && chat) {
         typingIndicator.classList.add('hidden');
-        chatStatus.textContent = chat.type === 'group' ? ${chat.participants.length} participants : 'Online';
+        chatStatus.textContent = chat.type === 'group' ? `${chat.participants.length} participants` : 'Online';
     }
 }
 
@@ -1015,6 +1032,26 @@ function setupChatEventListeners() {
             if (!emojiPicker.contains(e.target) && e.target !== emojiButton) {
                 emojiPickerActive = false;
                 emojiPicker.classList.remove('active');
+            }
+        });
+    }
+
+    // Ensure send button works even if loadChatMessages didn't attach listeners
+    const globalSendButton = document.getElementById('sendButton');
+    const globalMessageInput = document.getElementById('messageInput');
+    if (globalSendButton) {
+        // make sure it's not a submit button inside any accidental forms
+        globalSendButton.type = 'button';
+        globalSendButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            sendMessage();
+        });
+    }
+    if (globalMessageInput) {
+        globalMessageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
         });
     }
@@ -1105,12 +1142,12 @@ function createNewChat() {
     }
     
     // If it's a group chat without a name, generate one
-    if (selectedUsers.length > 1 && !chatName) {
+        if (selectedUsers.length > 1 && !chatName) {
         const userNames = selectedUsers.map(id => {
             const user = users.find(u => u.id === id);
             return user ? user.name : 'Unknown';
         });
-        chatName = ${userNames.join(', ')};
+        chatName = userNames.join(', ');
         if (chatName.length > 30) {
             chatName = chatName.substring(0, 27) + '...';
         }
@@ -1218,7 +1255,87 @@ function startMessageRefresh() {
                 }
             }
         }
-    }, 200); // Refresh every 0.2 seconds
+    }, 1000); // Refresh every 1 second
+}
+
+// Simulate incoming messages from other participants for testing
+function simulateIncomingMessages() {
+    // don't run simulator if no user is logged in
+    if (!currentUser) return;
+
+    setInterval(() => {
+        try {
+            const allChats = JSON.parse(localStorage.getItem('chats')) || [];
+            const messagesData = JSON.parse(localStorage.getItem('messages')) || {};
+
+            // Only consider chats where current user is a participant
+            const userChats = allChats.filter(c => c.participants && c.participants.includes(currentUser.id));
+            if (userChats.length === 0) return;
+
+            // Pick a random chat
+            const chat = userChats[Math.floor(Math.random() * userChats.length)];
+            if (!chat) return;
+
+            // Pick a random other participant as sender
+            const otherParticipants = chat.participants.filter(id => id !== currentUser.id);
+            if (otherParticipants.length === 0) return;
+            const senderId = otherParticipants[Math.floor(Math.random() * otherParticipants.length)];
+
+            // Sample messages
+            const sampleTexts = [
+                'Hello!',
+                'Are you there?',
+                'Let\'s catch up later.',
+                'Nice!',
+                'On my way.',
+                'Got it, thanks!',
+                'See you soon 👋',
+                'That sounds great.'
+            ];
+
+            const content = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+
+            // Prepare new message
+            const chatMsgs = messagesData[chat.id] || [];
+            const newMsg = {
+                id: chatMsgs.length > 0 ? Math.max(...chatMsgs.map(m => m.id)) + 1 : 1,
+                senderId: senderId,
+                content: content,
+                timestamp: new Date().toISOString(),
+                type: 'text'
+            };
+
+            if (!messagesData[chat.id]) messagesData[chat.id] = [];
+            messagesData[chat.id].push(newMsg);
+
+            // Update chat metadata and unread count
+            const chatIndex = allChats.findIndex(c => c.id === chat.id);
+            if (chatIndex !== -1) {
+                allChats[chatIndex].lastMessage = content;
+                allChats[chatIndex].lastMessageTime = newMsg.timestamp;
+                if (currentChatId !== chat.id) {
+                    allChats[chatIndex].unread = (allChats[chatIndex].unread || 0) + 1;
+                }
+            }
+
+            // Save to localStorage
+            localStorage.setItem('messages', JSON.stringify(messagesData));
+            localStorage.setItem('chats', JSON.stringify(allChats));
+
+            // Update in-memory state and UI
+            messages = messagesData;
+            chats = allChats;
+
+            if (currentChatId === chat.id && document.getElementById('chatView') && !document.getElementById('chatView').classList.contains('hidden')) {
+                loadChatMessages(chat.id);
+            } else {
+                // Update chats list to show unread
+                loadChats();
+            }
+        } catch (err) {
+            console.error('Simulator error:', err);
+        }
+    }, 7000); // every 7 seconds
 }
 
 // Profile Page
@@ -1340,7 +1457,7 @@ function initSettingsPage() {
     const privacySelects = document.querySelectorAll('.settings-section select');
     privacySelects.forEach(select => {
         select.addEventListener('change', function() {
-            alert(Privacy setting updated: ${this.value});
+            alert(`Privacy setting updated: ${this.value}`);
         });
     });
 }
