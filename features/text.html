@@ -43,3 +43,48 @@
    
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="modal" id="addStatusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Status Update</h3>
+                <button class="modal-close" id="closeStatusModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="statusText" class="form-label">Status Text</label>
+                    <input type="text" id="statusText" class="form-control" placeholder="What's on your mind?">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Upload Image/Video</label>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                        <p>Click to upload image or video</p>
+                        <input type="file" id="statusMedia" accept="image/*,video/*" hidden>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelStatusBtn">Cancel</button>
+                <button class="btn btn-primary" id="postStatusBtn">Post Status</button>
+            </div>
+        </div>
+    </div>
+   
+</body>
+</html>
