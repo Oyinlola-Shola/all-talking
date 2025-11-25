@@ -1,0 +1,18 @@
+{
+    "require": {
+        "doctrine/annotations": "^2.0",
+        "zircote/swagger-php": "^5.4",
+        "phpmailer/phpmailer": "^6.11",
+        "firebase/php-jwt": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "NewdichApp":"app/",
+            "NewdichApis":"api/",
+            "NewdichRoute":"route/",
+            "NewdichSchema":"Schema/",
+            "NewdichSrc":"src/",
+            "NewdichMail":"Mail/"
+        }
+    }
+}
