@@ -654,6 +654,7 @@ p {
     padding: 1rem;
     background-color: var(--surface-color);
     border-top: 1px solid var(--border-color);
+    padding-top: 500px;
 }
 
 .emoji-button {
@@ -903,6 +904,7 @@ input:checked + .toggle-slider:before {
 
 .modal-body {
     margin-bottom: 1.5rem;
+    display: block;
 }
 
 .modal-footer {

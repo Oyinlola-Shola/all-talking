@@ -41,7 +41,7 @@
                     <input type="password" id="confirmPassword" class="form-control" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="reg">Register</button>
             </form>
             
             <div class="auth-footer">
@@ -50,7 +50,51 @@
             </div>
         </div>
     </div>
-    
-    <script src="../js/script.js"></script>
+    <script>
+        async function registerData(fullnameToCome,EmailToCome, phone_numToCome, PasswordToCome){
+                const api = await fetch('http://localhost:300/registerapi',{
+                    method:"POST",
+                    headers:{"content-type":"application/json"},
+                    body:JSON.stringify({
+                        fullname:fullnameToCome,
+                        email:EmailToCome,
+                        phone_number:phone_numToCome,
+                        password:PasswordToCome
+                    })
+                });
+                const response = await api.json();
+                if(api.ok){
+                     if(response.status ==="success"){
+                    window.location.href="login.html";
+                }
+                else{
+                      alert('Invalid email/username or password');
+                }
+            }
+        }
+
+        document.getElementById("reg").addEventListener("click", ()=>{
+            event.preventDefault();
+            const fname = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const phone_num = document.getElementById("phone").value;
+            const password = document.getElementById("password").value;
+            const re_pwd = document.getElementById('confirmPassword').value;
+            if(fname==='' || email==='' || phone_num==='' || password===''){
+                alert("all field required");
+            }
+            else if(password.length < 8){
+                alert("password must have 8 or more characters");
+            }
+            else if(password!==re_pwd){
+                alert("password not match");
+            }
+            else{
+                registerData(fname, email, phone_num, password);
+            }
+        })
+        
+    </script>
+    <script src="../js/Demo_script.js"></script>
 </body>
 </html>

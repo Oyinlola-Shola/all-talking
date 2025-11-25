@@ -443,24 +443,21 @@ function initLoginPage() {
         loginForm.appendChild(demoButton);
         
         // Regular login form submission
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const users = JSON.parse(localStorage.getItem('users'));
-            const user = users.find(u => (u.email === email || u.name === email) && u.password === password);
-            
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                console.log('User logged in:', user.name);
-                window.location.href = 'chat.html';
-            } else {
-                alert('Invalid email/username or password');
-            }
-        });
+        // loginForm.addEventListener('submit', function(e) {
+        //     e.preventDefault();
+        //     const email = document.getElementById('email').value;
+        //     const password = document.getElementById('password').value;
+        //     const users = JSON.parse(localStorage.getItem('users'));
+        //     const user = users.find(u => (u.email === email || u.name === email) && u.password === password);
+        //     if (user) {
+        //         currentUser = user;
+        //         localStorage.setItem('currentUser', JSON.stringify(user));
+        //         console.log('User logged in:', user.name);
+        //         window.location.href = 'chat.html';
+        //     } else {
+        //         alert('Invalid email/username or password');
+        //     }
+        // });
     }
 }
 
@@ -666,10 +663,10 @@ function loadChats() {
     // Filter chats to show only those where current user is a participant
     const userChats = chats.filter(chat => chat.participants.includes(currentUser.id));
     
-    if (userChats.length === 0) {
-        chatsList.innerHTML = '<div class="no-chats">No conversations yet. Start a new chat!</div>';
-        return;
-    }
+    // if (userChats.length === 0) {
+    //  //   chatsList.innerHTML = '<div class="no-chats">No conversations yet. Start a new chat!</div>';
+    //     return;
+    // }
     
     userChats.forEach(chat => {
         const chatElement = document.createElement('div');
@@ -764,12 +761,12 @@ function openChat(chatId) {
     // `;
     
     // Add back button event listener
-    document.getElementById('backToChats').addEventListener('click', () => {
-        document.getElementById('chatsView').classList.remove('hidden');
-        document.getElementById('chatView').classList.add('hidden');
-        window.history.pushState({}, '', 'chat.html');
-        currentChatId = null;
-    });
+    // document.getElementById('backToChats').addEventListener('click', () => {
+    //  //   document.getElementById('chatsView').classList.remove('hidden');
+    //    // document.getElementById('chatView').classList.add('hidden');
+    //     window.history.pushState({}, '', 'chat.html');
+    //     currentChatId = null;
+    // });
     
     // Add call button event listeners
     document.getElementById('voiceCallBtn').addEventListener('click', () => {
@@ -805,27 +802,27 @@ function loadChatMessages(chatId) {
     const users = JSON.parse(localStorage.getItem('users'));
     const chat = chats.find(c => c.id === chatId);
     
-    if (chatMessages.length === 0) {
-        messagesContainer.innerHTML = '<div class="no-messages">No messages yet. Start the conversation!</div>';
-    } else {
-        chatMessages.forEach(msg => {
-            const messageElement = document.createElement('div');
-            messageElement.className = `message ${msg.senderId === currentUser.id ? 'sent' : 'received'}`;
+  if (chatMessages.length === 0) {
+     messagesContainer.innerHTML = '<div class="no-messages">No messages yet. Start the conversation!</div>';
+ //   } else {
+        // chatMessages.forEach(msg => {
+            // const messageElement = document.createElement('div');
+            // messageElement.className = `message ${msg.senderId === currentUser.id ? 'sent' : 'received'}`;
             
-            const sender = users.find(u => u.id === msg.senderId);
-            const senderName = sender ? sender.name : 'Unknown';
+            // const sender = users.find(u => u.id === msg.senderId);
+            // const senderName = sender ? sender.name : 'Unknown';
             
-            messageElement.innerHTML = `
-                ${msg.senderId !== currentUser.id && chat.type === 'group' ? 
-                    `<div class="message-sender">${senderName}</div>` : ''}
-                <div class="message-content">
-                    <p>${msg.content}</p>
-                    <div class="message-time">${formatTime(msg.timestamp)}</div>
-                </div>
-            `;
+            // messageElement.innerHTML = `
+            //     ${msg.senderId !== currentUser.id && chat.type === 'group' ? 
+            //         `<div class="message-sender">${senderName}</div>` : ''}
+            //     <div class="message-content">
+            //         <p>${msg.content}</p>
+            //         <div class="message-time">${formatTime(msg.timestamp)}</div>
+            //     </div>
+            // `;
             
-            messagesContainer.appendChild(messageElement);
-        });
+         //   messagesContainer.appendChild(messageElement);
+       // });
     }
     
     // Scroll to bottom
@@ -1007,10 +1004,10 @@ function setupChatEventListeners() {
     console.log('Setting up chat event listeners');
     
     // Add chat button
-    const addChatBtn = document.getElementById('addChatBtn');
-    if (addChatBtn) {
-        addChatBtn.addEventListener('click', showAddChatModal);
-    }
+    // const addChatBtn = document.getElementById('addChatBtn');
+    // if (addChatBtn) {
+    //     addChatBtn.addEventListener('click', showAddChatModal);
+    // }
     
     // Emoji picker
     const emojiButton = document.getElementById('emojiButton');
@@ -1082,12 +1079,12 @@ function setupChatEventListeners() {
 
 // Show add chat modal
 function showAddChatModal() {
-    console.log('Showing add chat modal');
-    const modal = document.getElementById('addChatModal');
-    if (!modal) {
-        console.log('Add chat modal not found');
-        return;
-    }
+    // console.log('Showing add chat modal');
+    // const modal = document.getElementById('addChatModal');
+    // if (!modal) {
+    //     console.log('Add chat modal not found');
+    //     return;
+    // }
     
     const users = JSON.parse(localStorage.getItem('users'));
     const otherUsers = users.filter(u => u.id !== currentUser.id);
@@ -1326,12 +1323,12 @@ function simulateIncomingMessages() {
             messages = messagesData;
             chats = allChats;
 
-            if (currentChatId === chat.id && document.getElementById('chatView') && !document.getElementById('chatView').classList.contains('hidden')) {
-                loadChatMessages(chat.id);
-            } else {
-                // Update chats list to show unread
-                loadChats();
-            }
+            // if (currentChatId === chat.id && document.getElementById('chatView') && !document.getElementById('chatView').classList.contains('hidden')) {
+            //     loadChatMessages(chat.id);
+            // } else {
+            //     // Update chats list to show unread
+            //     loadChats();
+            // }
         } catch (err) {
             console.error('Simulator error:', err);
         }
@@ -1384,133 +1381,133 @@ function toggleProfileEdit() {
     document.getElementById('editView').classList.toggle('hidden');
 }
 
-// Save profile
-function saveProfile() {
-    const name = document.getElementById('editName').value;
-    const email = document.getElementById('editEmail').value;
-    const phone = document.getElementById('editPhone').value;
+// // Save profile
+// function saveProfile() {
+//     const name = document.getElementById('editName').value;
+//     const email = document.getElementById('editEmail').value;
+//     const phone = document.getElementById('editPhone').value;
     
-    // Update current user
-    currentUser.name = name;
-    currentUser.email = email;
-    currentUser.phone = phone;
+//     // Update current user
+//     currentUser.name = name;
+//     currentUser.email = email;
+//     currentUser.phone = phone;
     
-    // Update in localStorage
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+//     // Update in localStorage
+//     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     
-    // Update users list
-    const users = JSON.parse(localStorage.getItem('users'));
-    const userIndex = users.findIndex(u => u.id === currentUser.id);
-    if (userIndex !== -1) {
-        users[userIndex] = currentUser;
-        localStorage.setItem('users', JSON.stringify(users));
-    }
+//     // Update users list
+//     const users = JSON.parse(localStorage.getItem('users'));
+//     const userIndex = users.findIndex(u => u.id === currentUser.id);
+//     if (userIndex !== -1) {
+//         users[userIndex] = currentUser;
+//         localStorage.setItem('users', JSON.stringify(users));
+//     }
     
-    // Reload profile data
-    loadProfileData();
-    toggleProfileEdit();
+//     // Reload profile data
+//     loadProfileData();
+//     toggleProfileEdit();
     
-    alert('Profile updated successfully!');
-}
+//     alert('Profile updated successfully!');
+// }
 
-// Change avatar
-function changeAvatar() {
-    // Create a file input element
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
+// // Change avatar
+// function changeAvatar() {
+//     // Create a file input element
+//     const fileInput = document.createElement('input');
+//     fileInput.type = 'file';
+//     fileInput.accept = 'image/*';
     
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
+//     fileInput.addEventListener('change', function() {
+//         if (this.files && this.files[0]) {
+//             const reader = new FileReader();
             
-            reader.onload = function(e) {
-                // In a real app, you would upload the image and save the URL
-                alert('Avatar updated! In a real app, this would save your new profile picture.');
-            };
+//             reader.onload = function(e) {
+//                 // In a real app, you would upload the image and save the URL
+//                 alert('Avatar updated! In a real app, this would save your new profile picture.');
+//             };
             
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
+//             reader.readAsDataURL(this.files[0]);
+//         }
+//     });
     
-    fileInput.click();
-}
+//     fileInput.click();
+// }
 
-// Settings Page
-function initSettingsPage() {
-    console.log('Initializing settings page');
-    loadSettings();
+// // Settings Page
+// function initSettingsPage() {
+//     console.log('Initializing settings page');
+//     loadSettings();
     
-    // Theme toggle
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('change', toggleTheme);
-    }
+//     // Theme toggle
+//     const themeToggle = document.getElementById('themeToggle');
+//     if (themeToggle) {
+//         themeToggle.addEventListener('change', toggleTheme);
+//     }
     
-    // Update settings form
-    const updateSettingsForm = document.getElementById('updateSettingsForm');
-    if (updateSettingsForm) {
-        updateSettingsForm.addEventListener('submit', updateSettings);
-    }
+//     // Update settings form
+//     const updateSettingsForm = document.getElementById('updateSettingsForm');
+//     if (updateSettingsForm) {
+//         updateSettingsForm.addEventListener('submit', updateSettings);
+//     }
     
-    // Privacy settings
-    const privacySelects = document.querySelectorAll('.settings-section select');
-    privacySelects.forEach(select => {
-        select.addEventListener('change', function() {
-            alert(`Privacy setting updated: ${this.value}`);
-        });
-    });
-}
+//     // Privacy settings
+//     const privacySelects = document.querySelectorAll('.settings-section select');
+//     privacySelects.forEach(select => {
+//         select.addEventListener('change', function() {
+//             alert(`Privacy setting updated: ${this.value}`);
+//         });
+//     });
+// }
 
-// Load settings
-function loadSettings() {
-    if (!currentUser) return;
+// // Load settings
+// function loadSettings() {
+//     if (!currentUser) return;
     
-    // Set current values
-    document.getElementById('settingsName').value = currentUser.name;
-    document.getElementById('settingsEmail').value = currentUser.email;
-    document.getElementById('settingsPhone').value = currentUser.phone;
+//     // Set current values
+//     document.getElementById('settingsName').value = currentUser.name;
+//     document.getElementById('settingsEmail').value = currentUser.email;
+//     document.getElementById('settingsPhone').value = currentUser.phone;
     
-    // Set theme toggle
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    document.getElementById('themeToggle').checked = currentTheme === 'dark';
-}
+//     // Set theme toggle
+//     const currentTheme = localStorage.getItem('theme') || 'light';
+//     document.getElementById('themeToggle').checked = currentTheme === 'dark';
+// }
 
-// Toggle theme
-function toggleTheme() {
-    const isDark = document.getElementById('themeToggle').checked;
-    const theme = isDark ? 'dark' : 'light';
+// // Toggle theme
+// function toggleTheme() {
+//     const isDark = document.getElementById('themeToggle').checked;
+//     const theme = isDark ? 'dark' : 'light';
     
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-}
+//     document.documentElement.setAttribute('data-theme', theme);
+//     localStorage.setItem('theme', theme);
+// }
 
-// Update settings
-function updateSettings(e) {
-    e.preventDefault();
+// // Update settings
+// function updateSettings(e) {
+//     e.preventDefault();
     
-    const name = document.getElementById('settingsName').value;
-    const email = document.getElementById('settingsEmail').value;
-    const phone = document.getElementById('settingsPhone').value;
+//     const name = document.getElementById('settingsName').value;
+//     const email = document.getElementById('settingsEmail').value;
+//     const phone = document.getElementById('settingsPhone').value;
     
-    // Update current user
-    currentUser.name = name;
-    currentUser.email = email;
-    currentUser.phone = phone;
+//     // Update current user
+//     currentUser.name = name;
+//     currentUser.email = email;
+//     currentUser.phone = phone;
     
-    // Update in localStorage
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+//     // Update in localStorage
+//  //   localStorage.setItem('currentUser', JSON.stringify(currentUser));
     
-    // Update users list
-    const users = JSON.parse(localStorage.getItem('users'));
-    const userIndex = users.findIndex(u => u.id === currentUser.id);
-    if (userIndex !== -1) {
-        users[userIndex] = currentUser;
-        localStorage.setItem('users', JSON.stringify(users));
-    }
+//     // Update users list
+//     const users = JSON.parse(localStorage.getItem('users'));
+//     const userIndex = users.findIndex(u => u.id === currentUser.id);
+//     if (userIndex !== -1) {
+//         users[userIndex] = currentUser;
+//         localStorage.setItem('users', JSON.stringify(users));
+//     }
     
-    alert('Settings updated successfully!');
-}
+//     alert('Settings updated successfully!');
+// }
 
 // Add some CSS for empty states
 const style = document.createElement('style');

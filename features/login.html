@@ -26,7 +26,7 @@
                     <input type="password" id="password" class="form-control" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="login">Login</button>
             </form>
             
             <div class="auth-footer">
@@ -35,7 +35,43 @@
             </div>
         </div>
     </div>
-    
-    <script src="../js/script.js"></script>
+    <script>
+        async function sendData(EmailToCome, PasswordToCome){
+            //  console.log(EmailToCome, PasswordToCome);
+              const api = await fetch('http://localhost:300/loginapi', {
+                method:"POST",
+                header:{"content-type":"application/json"},
+                body:JSON.stringify({
+                    email:EmailToCome,
+                    password:PasswordToCome
+                })
+            });
+              const response = await api.json();
+             
+            if(api.ok){
+                if(response.status ==="success"){
+                    window.location.href="chat.html";
+                }
+                else{
+                      alert('Invalid email/username or password');
+                }
+            }  
+        }
+        document.getElementById("login").addEventListener("click", ()=>{
+             event.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            if(email==='' || email===null || email===undefined || password==='' || password===undefined || password===null){
+                alert("all field required");
+            }
+            else if(password.length < 8){
+                alert('password not up to 8 charaters')
+            }
+            else{
+                sendData(email, password);
+            }
+        });
+    </script>
+    <!-- <script src="../js/script.js"></script> -->
 </body>
 </html>
