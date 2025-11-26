@@ -45,7 +45,42 @@ class Register{
     }
 
     public function registerUser(){
-        
+        $full_name = $this->mid->cleanData($this->dto->full_name);
+        $email = $this->mid->cleanData($this->dto->email);
+        $phone_number = $this->mid->cleanData($this->dto->phone_number);
+        $password = $this->mid->verfiyPwd($this->dto->password);
+        $user_name = $this->mid->genUserName();
+        include($_SERVER['DOCUMENT_ROOT'].'/Schema/index.php');
+        try{
+            global $connector;
+            $checkNum = $connector;
+            $checkNum ->prepare("SELECT * FROM UserData WHERE phone_number=:phone_numer");
+            $checkNum ->bindParam(":phone_number", $phone_number, PDO::PARAM_STR);
+            $checkNum ->execute();
+            if($checkNum->rowCount() > 0){
+                echo json_encode(array("status"=>"fail", "response"=>"number already exist, go and register"), JSON_PRETTY_PRINT);
+                http_response_code(404);
+                exit();
+            }
+            else{
+                $insert=$connector;
+                $insert->prepare("INSERT INTO UserData(phone_number, email, full_name, password, user_name)VALUE(:phone_number, :email, :full_name, :password, :user_name)");
+                $insert->bindParam(":phone_number", $phone_number, PDO::PARAM_STR);
+                $insert->bindParam(":email", $email, PDO::PARAM_STR);
+                $insert->bindParam(":full_name", $full_name, PDO::PARAM_STR);
+                $insert->bindParam(":password", $password, PDO::PARAM_STR);
+                $insert->bindParam(":user_name", $user_name, PDO::PARAM_STR);
+                $insert->execute();
+                if($insert){
+                    echo json_encode(array("status"=>"success", "response"=>"account created successfully"), JSON_PRETTY_PRINT);
+                    http_response_code(200);
+                    exit();
+                }
+            }
+        }
+        catch(Exception $error){
+            echo json_encode(array("status"=>"fail", "response"=>"something went wrong with your code"), JSON_PRETTY_PRINT).$error->getMessage();
+        }
     }
 }
 ?>

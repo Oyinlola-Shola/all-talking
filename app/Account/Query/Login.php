@@ -39,11 +39,45 @@ class Login{
     private LogMid $mid;
 
     public function __construct(Login $d, LogMid $m){
-        $this->LogDTO = $d;
-        $this->Login = $m;
+        $this->dto = $d;
+        $this->mid = $m;
     }
 
     public function loginUser(){
-        
+        $phone_number = $this->mid->cleanData($this->dto->$phone_number);
+        $passwaord  = $this->mid->cleanData($this->dto->$passwaord);
+
+        include($_SERVER['DOCUMENT_ROOT'].'/Schema/index.php');
+        try{
+            global $connector;
+            $checkNumber=$connector;
+            $checkNumber->prepare("SELECT * FROM LoginTable WHERE phone_number=:phone_number and pwd=:pwd");
+            $checkNumber->bindParam(":phone_number", $phone_number, PDO::PARAM_STR);
+             $checkPwd->bindParam(":pwd", $passwaord, PDO::PARAM_STR);
+            $checkNumber->execute();
+            if($checkNumber->rowCount() > 0){
+                $checkNumber=$feh;
+                $feh->fetch(PDO::FETCH_ASSOC);
+                $chkPwd = $feh['password'];
+                if($chkPwd == $passwaord){
+                    echo json_encode(array("status"=>"success", "response"=>"can be authorized in"), JSON_PRETTY_PRINT);
+                    http_response_code(200);
+                    exit();
+                }
+                else{
+                    echo json_encode(array("status"=>"fail", "response"=>"incorrect password"), JSON_PRETTY_PRINT);
+                    http_response_code(400);
+                    exit();
+                }
+            }
+            else{
+                echo json_encode(array("status"=>"fail", "response"=>"phone number not found please go and register"), JSON_PRETTY_PRINT);
+                http_response_code(400);
+                exit();
+            }
+        }
+         catch(Exception $error){
+            echo json_encode(array("status"=>"fail", "response"=>"something went wrong with your code"), JSON_PRETTY_PRINT).$error->getMessage();
+        }
     }
 }
