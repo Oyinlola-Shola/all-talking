@@ -5,8 +5,8 @@ use NewdichSchema\Settings;
 
 /**
  * @OA\Info(
- *      title=Settings::APP_ANNOTATION_TITLE,
- *      version=Settings::APP_VERSION
+ *      title="API documentation for all-talking.com",
+ *      version="1.0.0.0"
  * )
  */
 
