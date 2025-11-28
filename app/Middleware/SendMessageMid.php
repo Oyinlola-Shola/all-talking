@@ -1,7 +1,7 @@
 <?php
 namespace NewdichApp\Middleware;
 
-class SaveMessageMid{
+class SendMessageMid{
     public function cleanData($data){
         return htmlspecialchars(trim($data));
     }

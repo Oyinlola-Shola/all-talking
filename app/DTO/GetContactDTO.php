@@ -2,7 +2,7 @@
 namespace NewdichApp\DTO;
 
 class GetContactDTO{
-    public $user_name_Search;
+    public $user_name;
 
     public function __construct(array $dataIn){
         $getData = get_object_vars($this);

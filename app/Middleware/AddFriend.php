@@ -1,7 +1,7 @@
 <?php
 namespace NewdichApp\Middleware;
 
-class GetContactMid{
+class AddFriendMid{
     public function cleanData($data){
         return htmlspecialchars(trim($data));
     }

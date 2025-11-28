@@ -16,4 +16,7 @@ elseif($url==='/getContact'){
 elseif($url==='/saveMessage'){
     require_once '/app/Account/Controller/saveMessageController.php';
 }
+elseif($url==='/addFriends'){
+    require_once '/app/Acount/Controller/AddFrriendController.php';
+}
 ?>

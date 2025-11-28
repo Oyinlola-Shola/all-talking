@@ -1,11 +1,9 @@
 <?php
 namespace NewdichApp\DTO;
 
-class SaveMesDTO{
-    public $user_name;
-    public $receiverUser_name;
-    public $receiverPhone_num;
-    public $phone_num;
+class SendMessageDTO{
+    public $sender_phone_number;
+    public $receiver_Phone_number;
     public $message;
 
     public function __construct(array $dataIn){
