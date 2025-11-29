@@ -1,7 +1,7 @@
 <?php
 namespace NewdichApp\Account\DTO;
 
-class AddFriendDTO{
+class ContactListDTO{
     public $user_name;
     public $user_name_to_add;
     public function __construct(array $dataIN){

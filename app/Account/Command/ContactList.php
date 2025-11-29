@@ -14,8 +14,8 @@ use NewdichApp\Middleware\AddFriendMid;
  *      @OA\ResquestBody(
  *          required=true,
  *          @OA\JsonContent(
- *              required=['name_of_friend'],
- *              @OA\Property(property="name_of_friend")
+ *              required={'name_of_friend'},
+ *              @OA\Property(property="name_of_friend", type="string", example="John Don")
  *          )
  *      ),
  *      @oA\Response(
@@ -32,7 +32,7 @@ use NewdichApp\Middleware\AddFriendMid;
  *      )
  *  )
  */
-class AddFriend{
+class ContactList{
     private AddFriendDTO $dto;
     private AddFriendMid $mid;
 
@@ -68,6 +68,8 @@ class AddFriend{
             }
             else{
                 echo json_encode(array("status"=>"fail", "response"=>"something is wrong"), JSON_PRETTY_PRINT);
+                http_response_code(400);
+                exit();
             }
         }
         catch(Exception $error){

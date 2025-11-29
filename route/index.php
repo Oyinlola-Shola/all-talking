@@ -16,7 +16,19 @@ elseif($url==='/getContact'){
 elseif($url==='/saveMessage'){
     require_once '/app/Account/Controller/saveMessageController.php';
 }
-elseif($url==='/addFriends'){
-    require_once '/app/Acount/Controller/AddFrriendController.php';
+elseif($url==='/Add_to_ContactList'){
+    require_once '/app/Acount/Controller/ContactListController.php';
+}
+elseif($url==='/upload_Status'){
+    require_once '/app/Account/Controller/UploadStatusController.php';
+}
+elseif($url==='/Edit_Profile'){
+    require_once '/app/Account/Controller/EditProfileController.php';
+}
+elseif($url==='/updateAccount'){
+    require_once '/app/Account/Controller/UpdateAccountController.php';
+}
+elseif($url==='/deleteProfile'){
+    require_once '/app/Account/Controller/DeleteProfileController.php';
 }
 ?>
